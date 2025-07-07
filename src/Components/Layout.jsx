@@ -1,5 +1,5 @@
 import React from "react";
-
+import '../Style/Layout.css';
 const Layout = ()=>{
     return (
         <div className="LayoutContainer">
