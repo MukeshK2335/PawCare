@@ -1,0 +1,14 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+.LayoutContainer{
+
+   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; 
+   display: flex;
+   justify-content: center;
+}
+.heading{
+    color: aqua;
+}
