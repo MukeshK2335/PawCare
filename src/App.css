@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #1f2937;
+    color: white;
+}
+
+.App {
+    min-height: 100vh;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background: #0f172a;
+}
+
+body.dark-mode .header {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .stats {
+    background: #0f172a;
+}

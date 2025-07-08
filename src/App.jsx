@@ -1,11 +1,17 @@
-import React from "react";
-import Layout from "./Components/Layout";
+import React from 'react';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import Stats from './components/Stats';
+import './App.css';
 
-const App = ()=>{
+function App() {
     return (
-        <div>
-            <Layout/>
+        <div className="App">
+            <Header />
+            <Hero />
+            <Stats />
         </div>
-    )
+    );
 }
-export default App
+
+export default App;
