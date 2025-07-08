@@ -8,7 +8,7 @@ const Hero = () => {
                 <div className="hero-content">
                     <div className="hero-text">
                         <h1 className="hero-title">
-                            Smart Health Monitoring for Your Pets
+                            Smart Health Monitoring for Your Cats
                         </h1>
                         <p className="hero-description">
                             Track your pet's vital signs in real-time with accurate monitoring of
