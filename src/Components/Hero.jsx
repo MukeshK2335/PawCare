@@ -1,5 +1,6 @@
 import React from 'react';
 import '../Style/Hero.css';
+import pawImage from "../assets/paw.png"
 
 const Hero = () => {
     return (
@@ -19,6 +20,9 @@ const Hero = () => {
                             <button className="btn-primary">Get Started</button>
                             <button className="btn-secondary">Learn How It Works</button>
                         </div>
+                    </div>
+                    <div className="hero-image-holder">
+                        <img src={pawImage} alt="pawcare" className="hero-image" />
                     </div>
                 </div>
             </div>
