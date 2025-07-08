@@ -11,7 +11,7 @@
 }
 
 .header-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 2rem;
     display: flex;
@@ -42,6 +42,8 @@
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.5px;
+
+
 }
 
 .nav {
@@ -103,6 +105,7 @@
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     text-transform: uppercase;
+    text-decoration: none;
 }
 
 .launch-btn:hover {
@@ -121,10 +124,33 @@
 
     .logo-text {
         font-size: 1.25rem;
+
     }
 
     .launch-btn {
         padding: 0.5rem 1rem;
         font-size: 0.75rem;
     }
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none !important;
+}
+
+.logo:hover,
+.logo:visited,
+.logo:focus,
+.logo:active {
+    text-decoration: none !important;
+}
+
+.logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-decoration: none !important;
 }
