@@ -133,24 +133,12 @@
     }
 }
 .logo {
+    all: unset;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     color: white;
-    text-decoration: none !important;
+
 }
 
-.logo:hover,
-.logo:visited,
-.logo:focus,
-.logo:active {
-    text-decoration: none !important;
-}
 
-.logo-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    text-decoration: none !important;
-}
