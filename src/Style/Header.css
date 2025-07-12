@@ -47,9 +47,9 @@
 }
 
 .nav {
-
+    position: absolute;
+    left: 35%;
     display: flex;
-
     gap: 2rem;
 }
 
@@ -112,28 +112,6 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
 }
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: white;
-    text-decoration: none !important;
-}
-
-.logo:hover,
-.logo:visited,
-.logo:focus,
-.logo:active {
-    text-decoration: none !important;
-}
-
-.logo-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    text-decoration: none !important;
-}
 
 @media (max-width: 768px) {
     .header-container {
@@ -154,3 +132,14 @@
         font-size: 0.75rem;
     }
 }
+.logo {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: white;
+
+}
+
+
