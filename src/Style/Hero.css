@@ -70,12 +70,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
 }
 
 .hero-image {
     max-width: 100%;
     height: auto;
     object-fit: contain;
+    opacity: 1;
+    transform: scale(1);
+    transition:
+            opacity 1.5s ease-in-out,
+            transform 0.5s ease-in-out;
+}
+.hero-image.zoom-in {
+    transform: scale(1.1);
+}
+.hero-image.zoom-out {
+    transform: scale(1);
 }
 
 .btn-primary {
