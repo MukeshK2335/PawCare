@@ -1,30 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { database } from '../firebase';
+import { ref, onValue } from 'firebase/database';
 import '../Style/Dashboard.css';
-import { database, ref, onValue } from '../firebase.js'; // Make sure this path is correct
+
+const normalRanges = {
+    Temperature: [101, 102.5],
+    'Heart Rate': [70, 120],
+    'Pulse (SpO2)': [95, 100],
+};
+
+const isWithinRange = (value, [min, max]) => value >= min && value <= max;
 
 const Dashboard = () => {
     const [vitals, setVitals] = useState([
         { label: 'Temperature', value: '--', status: 'loading' },
         { label: 'Heart Rate', value: '--', status: 'loading' },
-        { label: 'Respiratory', value: '--', status: 'loading' },
-        { label: 'Pulse', value: '--', status: 'loading' }
+        { label: 'Respiratory', value: '--', status: 'not-available' },
+        { label: 'Pulse (SpO2)', value: '--', status: 'loading' },
     ]);
 
     useEffect(() => {
-        const vitalsRef = ref(database, '/vitals');
+        const vitalsRef = ref(database, '/data');
+
         const unsubscribe = onValue(vitalsRef, (snapshot) => {
             const data = snapshot.val();
+            console.log("Realtime data:", data);
+
             if (data) {
-                setVitals([
-                    { label: 'Temperature', value: data.temperature || '--', status: 'normal' },
-                    { label: 'Heart Rate', value: data.heartRate || '--', status: 'normal' },
-                    { label: 'Respiratory', value: data.respiratory || '--', status: 'normal' },
-                    { label: 'Pulse', value: data.pulse || '--', status: 'normal' }
-                ]);
+                const updatedVitals = [
+                    {
+                        label: 'Temperature',
+                        value: data.temp || '--',
+                        status: data.temp !== undefined && isWithinRange(data.temp, normalRanges['Temperature']) ? 'normal' : 'abnormal'
+                    },
+                    {
+                        label: 'Heart Rate',
+                        value: data.heart || '--',
+                        status: data.heart !== undefined && isWithinRange(data.heart, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
+                    },
+                    {
+                        label: 'Respiratory',
+                        value: '--',
+                        status: 'not-available'
+                    },
+                    {
+                        label: 'Pulse (SpO2)',
+                        value: data.spo2 || '--',
+                        status: data.spo2 !== undefined && isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
+                    }
+                ];
+
+                setVitals(updatedVitals);
             }
         });
 
-        return () => unsubscribe(); // Clean up the listener when component unmounts
+        return () => unsubscribe();
     }, []);
 
     return (
@@ -38,37 +68,33 @@ const Dashboard = () => {
                         </div>
                         <div className="dashboard-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#ef4444"/>
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="#ef4444" />
                             </svg>
                         </div>
                     </div>
 
                     <div className="vitals-grid">
                         {vitals.map((vital, index) => (
-                            <div key={index} className="vital-card">
+                            <div key={index} className={`vital-card shadow-${vital.status}`}>
                                 <div className="vital-header">
                                     <span className="vital-label">{vital.label}</span>
-                                    <div className={`vital-status ${vital.status}`}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                            <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </div>
+                                    {vital.status !== 'not-available' && (
+                                        <div className={`vital-status-icon ${vital.status}`}>
+                                            {vital.status === 'abnormal' ? (
+                                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2a10 10 0 1 0 0.001 20.001A10 10 0 0 0 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
+                                                </svg>
+                                            ) : (
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="vital-value">{vital.value}</div>
                             </div>
                         ))}
-                    </div>
-
-                    <div className="status-indicator">
-                        <div className="status-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </div>
-                        <div className="status-text">
-                            <span className="status-title">All Vitals Normal</span>
-                            <span className="status-time">Updated just now</span>
-                        </div>
                     </div>
                 </div>
             </div>
