@@ -40,8 +40,10 @@ const Dashboard = () => {
                     },
                     {
                         label: 'Respiratory',
-                        value: '--',
-                        status: 'not-available'
+                        value: data.spo2 !== undefined
+                            ? isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'Normal' : 'Abnormal'
+                            : '--',
+                        status: data.spo2 !== undefined && isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
                     },
                     {
                         label: 'Pulse (SpO2)',

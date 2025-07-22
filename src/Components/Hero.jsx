@@ -1,16 +1,18 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import '../Style/Hero.css';
-import pawImage from "../assets/paw.png"
+import pawImage from "../assets/paw.png";
+import JujuAI from '../Components/jujuAi.jsx';
 
 const Hero = () => {
     const [zoomed, setZoomed] = useState(false);
+
     return (
         <section className="hero">
             <div className="hero-container">
                 <div className="hero-content">
                     <div className="hero-text">
                         <h1 className="hero-title">
-                            Smart Health Monitoring for Your Cats
+                            Smart Health Monitoring for Your Dogs
                         </h1>
                         <p className="hero-description">
                             Track your pet's vital signs in real-time with accurate monitoring of
@@ -33,6 +35,9 @@ const Hero = () => {
                     </div>
                 </div>
             </div>
+
+            {/* 🧠 Juju AI Assistant Floating Button */}
+            <JujuAI />
         </section>
     );
 };
