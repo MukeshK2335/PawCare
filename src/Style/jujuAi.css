@@ -1,0 +1,142 @@
+.juju-ai-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* AI Button with Dog Image */
+.juju-float-button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    width: 80px;  /* Increased size */
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.juju-float-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #ff69b4aa;
+}
+
+/* Dog image inside button */
+.juju-float-icon {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Chatbox */
+.juju-chatbox {
+    width: 320px;
+    height: 420px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 12px #ccc;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+/* Header with avatar */
+.juju-header {
+    background-color: #ff69b4;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.juju-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+/* Messages area */
+.juju-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.msg.user {
+    background-color: #d0f0fd;
+    align-self: flex-end;
+}
+
+.msg.juju {
+    background-color: #ffe0ec;
+    align-self: flex-start;
+}
+
+/* Input area */
+.juju-input {
+    display: flex;
+    padding: 8px;
+    border-top: 1px solid #ddd;
+}
+
+.juju-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.juju-input button {
+    margin-left: 5px;
+    padding: 8px 12px;
+    background-color: #ff69b4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.juju-button-with-caption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.juju-caption {
+    font-size: 18px;
+    font-weight: 900;
+    color: #ff008c;
+    /*text-shadow: 0 0 4px #ff66b2, 0 0 6px #ff99cc;*/
+    /*animation: glow-fade 1.5s infinite;*/
+}
+
+/*!* Optional animated glow effect *!*/
+/*@keyframes glow-fade {*/
+/*    0% { text-shadow: 0 0 5px #ff66b2; }*/
+/*    50% { text-shadow: 0 0 12px #ff99cc; }*/
+/*    100% { text-shadow: 0 0 5px #ff66b2; }*/
+/*}*/

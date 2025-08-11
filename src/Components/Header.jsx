@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../Style/Header.css';
+import {useNavigate} from "react-router-dom";
 
 const Header = () => {
+    const navigate = useNavigate();
     const [isDarkMode, setIsDarkMode] = useState(false);
     const location = useLocation();
 
@@ -30,7 +32,9 @@ const Header = () => {
                     <button className="theme-toggle" onClick={toggleDarkMode}>
                         <span className="theme-icon">{isDarkMode ? '☀️' : '🌙'}</span>
                     </button>
-                    <Link to="/dashboard" className="launch-btn">Launch Pet Dashboard</Link>
+                    <button className="launch-btn" onClick={()=>navigate("/Login")}>
+                        Launch Pet Dashboard
+                    </button>
                 </div>
             </div>
         </header>

@@ -5,6 +5,8 @@ import Hero from './components/Hero';
 import Stats from './components/Stats';
 import Dashboard from './components/Dashboard';
 import './App.css';
+import Login from './Components/Login';
+import SignUp from './Components/SignIn.jsx';
 
 function App() {
     return (
@@ -19,6 +21,8 @@ function App() {
                         </>
                     } />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signin" element={<SignUp />} />
                 </Routes>
             </div>
         </Router>
