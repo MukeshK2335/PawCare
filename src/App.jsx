@@ -20,7 +20,7 @@ function App() {
                             <Stats />
                         </>
                     } />
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard/:uid" element={<Dashboard />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signin" element={<SignUp />} />
                 </Routes>

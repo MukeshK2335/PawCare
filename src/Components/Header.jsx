@@ -32,9 +32,6 @@ const Header = () => {
                     <button className="theme-toggle" onClick={toggleDarkMode}>
                         <span className="theme-icon">{isDarkMode ? '☀️' : '🌙'}</span>
                     </button>
-                    <button className="launch-btn" onClick={()=>navigate("/Login")}>
-                        Launch Pet Dashboard
-                    </button>
                 </div>
             </div>
         </header>

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import '../Style/Hero.css';
 import pawImage from "../assets/paw.png";
 import JujuAI from '../Components/jujuAi.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
     const [zoomed, setZoomed] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <section className="hero">
@@ -20,7 +22,7 @@ const Hero = () => {
                             friends healthy and catch potential issues early.
                         </p>
                         <div className="hero-buttons">
-                            <button className="btn-primary">Get Started</button>
+                            <button className="btn-primary" onClick={() => navigate('/Login')}>Get Started</button>
                             <button className="btn-secondary">Learn How It Works</button>
                         </div>
                     </div>

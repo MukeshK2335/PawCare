@@ -27,7 +27,7 @@ const Login = () => {
 
             if (snapshot.exists()) {
                 console.log('User data:', snapshot.val());
-                navigate('/dashboard'); // ✅ Redirect if data found
+                navigate(`/dashboard/${user.uid}`); // ✅ Redirect if data found
             } else {
                 setError('No user data found in database.');
             }

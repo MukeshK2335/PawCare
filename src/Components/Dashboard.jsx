@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { database } from '../firebase';
 import { ref, onValue } from 'firebase/database';
 import '../Style/Dashboard.css';
@@ -12,6 +13,7 @@ const normalRanges = {
 const isWithinRange = (value, [min, max]) => value >= min && value <= max;
 
 const Dashboard = () => {
+    const { uid } = useParams();
     const [vitals, setVitals] = useState([
         { label: 'Temperature', value: '--', status: 'loading' },
         { label: 'Heart Rate', value: '--', status: 'loading' },
@@ -21,42 +23,66 @@ const Dashboard = () => {
 
     useEffect(() => {
         const vitalsRef = ref(database, '/data');
-
+        
         const unsubscribe = onValue(vitalsRef, (snapshot) => {
             const data = snapshot.val();
-            console.log("Realtime data:", data);
-
+            
             if (data) {
                 const updatedVitals = [
                     {
                         label: 'Temperature',
                         value: data.temp || '--',
-                        status: data.temp !== undefined && isWithinRange(data.temp, normalRanges['Temperature']) ? 'normal' : 'abnormal'
+                        status: data.temp ? 
+                                isWithinRange(data.temp, normalRanges['Temperature']) ? 'normal' : 'abnormal'
+                                : 'no-data'
                     },
                     {
                         label: 'Heart Rate',
                         value: data.heart || '--',
-                        status: data.heart !== undefined && isWithinRange(data.heart, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
+                        status: data.heart ? 
+                                isWithinRange(data.heart, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
+                                : 'no-data'
                     },
                     {
                         label: 'Respiratory',
-                        value: data.spo2 !== undefined
-                            ? isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'Normal' : 'Abnormal'
-                            : '--',
-                        status: data.spo2 !== undefined && isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
+                        value: (data.heart && isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'Normal' : 'Abnormal',
+                        status: (data.heart && !isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'abnormal' :
+                                (data.heart && isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'normal' :
+                                (data.respiratory ?
+                                isWithinRange(data.respiratory, [12, 20]) ? 'normal' : 'abnormal'
+                                : 'not-available')
                     },
                     {
                         label: 'Pulse (SpO2)',
                         value: data.spo2 || '--',
-                        status: data.spo2 !== undefined && isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
+                        status: data.spo2 ? 
+                                isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
+                                : 'no-data'
                     }
                 ];
 
                 setVitals(updatedVitals);
+            } else {
+                setVitals([
+                    { label: 'Temperature', value: '--', status: 'no-data' },
+                    { label: 'Heart Rate', value: '--', status: 'no-data' },
+                    { label: 'Respiratory', value: '--', status: 'no-data' },
+                    { label: 'Pulse (SpO2)', value: '--', status: 'no-data' },
+                ]);
             }
+        }, (error) => {
+            console.error('Error fetching vitals:', error);
+            setVitals([
+                { label: 'Temperature', value: '--', status: 'error' },
+                { label: 'Heart Rate', value: '--', status: 'error' },
+                { label: 'Respiratory', value: '--', status: 'error' },
+                { label: 'Pulse (SpO2)', value: '--', status: 'error' },
+            ]);
         });
 
-        return () => unsubscribe();
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
     return (
