@@ -1,9 +1,9 @@
 // src/Components/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { auth, database } from '../firebase';
+import { auth, db } from '../firebase'; // Import db from Firestore
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { ref, get } from 'firebase/database';
+import { doc, getDoc } from 'firebase/firestore'; // Import doc and getDoc
 import '../Style/Login.css';
 
 const Login = () => {
@@ -21,13 +21,13 @@ const Login = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // ✅ Fetch user data from Realtime Database
-            const userRef = ref(database, `users/${user.uid}`);
-            const snapshot = await get(userRef);
+            // ✅ Fetch user data from Firestore
+            const userDocRef = doc(db, 'User', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-            if (snapshot.exists()) {
-                console.log('User data:', snapshot.val());
-                navigate(`/dashboard/${user.uid}`); // ✅ Redirect if data found
+            if (userDoc.exists()) {
+                console.log('User data:', userDoc.data());
+                navigate(`/dashboard/${user.uid}`);
             } else {
                 setError('No user data found in database.');
             }
