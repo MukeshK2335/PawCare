@@ -33,7 +33,7 @@ const Signup = () => {
                 createdAt: new Date().toISOString(),
             });
 
-            navigate('/dashboard');
+            navigate('/');
         } catch (err) {
             setError(err.message);
         }
