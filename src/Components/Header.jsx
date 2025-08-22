@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../Style/Header.css';
 import {useNavigate} from "react-router-dom";
+import logo from '../assets/Logo.jpg';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Header = () => {
         <header className="header">
             <div className="header-container">
                 <Link to="/" className="logo">
-                    <div className="logo-icon">⚗️</div>
+                    <img src={logo} alt="Pawcare Logo" className="logo-icon" />
                     <span className="logo-text">Pawcare</span>
                 </Link>
 
