@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import './App.css';
 import Login from './Components/Login';
 import SignUp from './Components/SignIn.jsx';
+import Features from './Components/Features';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                     <Route path="/dashboard/:uid" element={<Dashboard />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signin" element={<SignUp />} />
+                    <Route path="/features" element={<Features />} />
                 </Routes>
             </div>
         </Router>
