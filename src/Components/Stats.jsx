@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../Style/Stats.css';
 
 const Stats = () => {
@@ -12,7 +12,7 @@ const Stats = () => {
     });
     const statsRef = useRef(null);
 
-    const stats = [
+    const stats = useMemo(() => [
         {
             key: 'accuracy',
             type: 'single',
@@ -42,27 +42,9 @@ const Stats = () => {
             suffix: 'min',
             label: 'Early Alerts'
         }
-    ];
+    ], []);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !isVisible) {
-                    setIsVisible(true);
-                    animateNumbers();
-                }
-            },
-            { threshold: 0.3 }
-        );
-
-        if (statsRef.current) {
-            observer.observe(statsRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, [isVisible]);
-
-    const animateNumbers = () => {
+    const animateNumbers = useCallback(() => {
         const duration = 2000; // 2 seconds
         const steps = 60; // 60 fps
         const stepTime = duration / steps;
@@ -123,7 +105,25 @@ const Stats = () => {
                 }, stepTime);
             }
         });
-    };
+    }, [stats]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !isVisible) {
+                    setIsVisible(true);
+                    animateNumbers();
+                }
+            },
+            { threshold: 0.3 }
+        );
+
+        if (statsRef.current) {
+            observer.observe(statsRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [isVisible, animateNumbers]);
 
     const formatValue = (key, value) => {
         if (key === 'pets') {
@@ -144,7 +144,7 @@ const Stats = () => {
                     {formatValue(stat.key, animatedValues[stat.key])}
                   </span>
                                     <span className="stat-suffix">{stat.suffix}</span>
-                                </>
+                                </> 
                             ) : (
                                 <>
                   <span className="stat-number">

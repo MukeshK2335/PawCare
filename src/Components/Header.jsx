@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../Style/Header.css';
-import {useNavigate} from "react-router-dom";
 import logo from '../assets/Logo.jpg';
 
 const Header = () => {
-    const navigate = useNavigate();
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const location = useLocation();
 
     const toggleDarkMode = () => {
         setIsDarkMode(!isDarkMode);

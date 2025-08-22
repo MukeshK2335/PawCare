@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { database, db } from '../firebase';
 import { ref, onValue } from 'firebase/database';
-import { doc, collection, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, setDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import '../Style/Dashboard.css';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = "AIzaSyBqapR-g_ly1lLUk5OzyOLlHZK6yxOr0rk"; // Use the same API key as jujuAi.jsx
@@ -29,6 +29,8 @@ const Dashboard = () => {
     const respiratoryStatus = vitals.find(vital => vital.label === 'Respiratory')?.status;
     const [hasCheckedCheckbox, setHasCheckedCheckbox] = useState(false);
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+    const [prediction, setPrediction] = useState({ summary: "", diseases: [] });
+    const [showPopup, setShowPopup] = useState(false);
 
     const handleCheckboxChange = (e, symptom) => {
         if (e.target.checked) {
@@ -124,7 +126,42 @@ const Dashboard = () => {
         };
     }, [uid]); // Add uid to dependency array
 
-    
+    const handleSubmitReport = async () => {
+        const abnormalVitals = vitals.filter(v => v.status === 'abnormal');
+
+        if (abnormalVitals.length === 0 && selectedSymptoms.length === 0) {
+            alert('No abnormal vitals or symptoms selected.');
+            return;
+        }
+
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const prompt = `My pet has the following abnormal vitals: ${abnormalVitals.map(v => `${v.label}: ${v.value}`).join(', ')}. The following symptoms were observed: ${selectedSymptoms.join(', ')}. Based on these symptoms, please provide a short, one-sentence summary of the potential issue, followed by a list of potential Zoonotic diseases with their types (e.g., Viral, Bacterial, Fungal). Format the list with each disease on a new line, like this: "- Disease Name (Type)".`;
+
+        try {
+            const result = await model.generateContent(prompt, { temperature: 0.7 });
+            const response = await result.response;
+            const text = await response.text();
+
+            // Save the report to Firestore
+            const reportRef = doc(collection(db, "reports"));
+            await setDoc(reportRef, {
+                uid,
+                vitals,
+                selectedSymptoms,
+                report: text,
+                timestamp: serverTimestamp(),
+            });
+
+            const [summary, ...diseases] = text.split('\n').filter(line => line.trim() !== '');
+            setPrediction({ summary, diseases });
+            setShowPopup(true);
+
+        } catch (error) {
+            console.error("Error generating or saving report:", error);
+            alert("Failed to generate or save the report. Please try again.");
+        }
+    };
+
 
 
 
@@ -169,7 +206,7 @@ const Dashboard = () => {
                     </div>
                     <button className="know-more-btn" onClick={() => navigate(`/analysis/${uid}`)}>Know More</button>
 
-                    {/* Conditional section for respiratory status */}
+                    {/* Conditional section for respiratory status */} 
                     <div className="respiratory-status-section">
                         {respiratoryStatus === 'abnormal' ? (
                             <div className="abnormal-questions">
@@ -208,6 +245,24 @@ const Dashboard = () => {
                             </div>
                         )}
                     </div>
+                    {showPopup && (
+                        <div className="popup-overlay">
+                            <div className="popup-card">
+                                <button className="popup-close-btn" onClick={() => setShowPopup(false)}>×</button>
+                                <h3>Zoonotic Disease Prediction:</h3>
+                                <p>{prediction.summary}</p>
+                                <h4>Potential Diseases:</h4>
+                                <ul>
+                                    {prediction.diseases.map((disease, index) => (
+                                        <li key={index}>{disease}</li>
+                                    ))}
+                                </ul>
+                                <h4>What to do next:</h4>
+                                <p>Please visit a veterinarian immediately to confirm the diagnosis and get the right treatment.</p>
+                                <p>Contact: +91 934567069</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

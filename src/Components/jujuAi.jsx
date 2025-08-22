@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Style/jujuAi.css';
 import jujuDogAi from '../assets/Juju.png';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -13,14 +13,14 @@ const JujuAI = () => {
     const [input, setInput] = useState("");
     
     // Add welcome message when component mounts
-    React.useEffect(() => {
+    useEffect(() => {
         if (messages.length === 0) {
             setMessages([{
                 sender: "juju",
                 text: "Hi there! I'm JuJu, your animal expert assistant. I can help with questions about pets, wildlife, animal care, behavior, and other animal-related topics. What would you like to know about animals today?"
             }]);
         }
-    }, [open]);
+    }, [open, messages.length]);
 
     const sendMessage = async () => {
         if (!input.trim()) return;
