@@ -8,6 +8,7 @@ import './App.css';
 import Login from './Components/Login';
 import SignUp from './Components/SignIn.jsx';
 import Features from './Components/Features';
+import HowItWorks from './Components/HowItWorks';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signin" element={<SignUp />} />
                     <Route path="/features" element={<Features />} />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
                 </Routes>
             </div>
         </Router>
