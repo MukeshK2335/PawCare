@@ -5,7 +5,7 @@ import { ref, onValue } from 'firebase/database';
 import '../Style/Dashboard.css';
 
 const normalRanges = {
-    Temperature: [101, 102.5],
+    Temperature: [80, 102.5],
     'Heart Rate': [70, 120],
     'Pulse (SpO2)': [95, 100],
 };
@@ -22,7 +22,7 @@ const Dashboard = () => {
     ]);
 
     useEffect(() => {
-        const vitalsRef = ref(database, '/data');
+        const vitalsRef = ref(database, '/s_data');
         
         const unsubscribe = onValue(vitalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -31,32 +31,32 @@ const Dashboard = () => {
                 const updatedVitals = [
                     {
                         label: 'Temperature',
-                        value: data.temp || '--',
-                        status: data.temp ? 
-                                isWithinRange(data.temp, normalRanges['Temperature']) ? 'normal' : 'abnormal'
+                        value: data.tempF || '--',
+                        status: data.tempF ? 
+                                isWithinRange(data.tempF, normalRanges['Temperature']) ? 'normal' : 'abnormal'
                                 : 'no-data'
                     },
                     {
                         label: 'Heart Rate',
-                        value: data.heart || '--',
-                        status: data.heart ? 
-                                isWithinRange(data.heart, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
+                        value: data.avgBPM || '--',
+                        status: data.avgBPM ? 
+                                isWithinRange(data.avgBPM, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
                                 : 'no-data'
                     },
                     {
                         label: 'Respiratory',
-                        value: (data.heart && isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'Normal' : 'Abnormal',
-                        status: (data.heart && !isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'abnormal' :
-                                (data.heart && isWithinRange(data.heart, normalRanges['Heart Rate'])) ? 'normal' :
+                        value: (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'Normal' : 'Abnormal',
+                        status: (data.avgBPM && !isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'abnormal' :
+                                (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'normal' :
                                 (data.respiratory ?
                                 isWithinRange(data.respiratory, [12, 20]) ? 'normal' : 'abnormal'
                                 : 'not-available')
                     },
                     {
                         label: 'Pulse (SpO2)',
-                        value: data.spo2 || '--',
-                        status: data.spo2 ? 
-                                isWithinRange(data.spo2, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
+                        value: data.currentBPM || '--',
+                        status: data.currentBPM ? 
+                                isWithinRange(data.currentBPM, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
                                 : 'no-data'
                     }
                 ];
