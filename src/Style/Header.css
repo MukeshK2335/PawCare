@@ -16,7 +16,7 @@
     padding: 0 2rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center; /* Changed to center */
 }
 
 .logo {
@@ -47,8 +47,6 @@
 }
 
 .nav {
-    position: absolute;
-    left: 35%;
     display: flex;
     gap: 2rem;
 }
@@ -139,7 +137,10 @@
     gap: 0.5rem;
     cursor: pointer;
     color: white;
+    margin-right: auto; /* Added */
 
 }
 
-
+.header-actions {
+    margin-left: auto; /* Added */
+}
