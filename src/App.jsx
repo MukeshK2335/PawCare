@@ -9,6 +9,7 @@ import Login from './Components/Login';
 import SignUp from './Components/SignIn.jsx';
 import Features from './Components/Features';
 import HowItWorks from './Components/HowItWorks';
+import Analysis from './Components/Analysis';
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/signin" element={<SignUp />} />
                     <Route path="/features" element={<Features />} />
                     <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/analysis/:uid" element={<Analysis />} />
                 </Routes>
             </div>
         </Router>

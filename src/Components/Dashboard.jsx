@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { database } from '../firebase';
+import { useParams, useNavigate } from 'react-router-dom';
+import { database, db } from '../firebase';
 import { ref, onValue } from 'firebase/database';
+import { doc, collection, setDoc, serverTimestamp } from 'firebase/firestore';
 import '../Style/Dashboard.css';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const API_KEY = "AIzaSyBqapR-g_ly1lLUk5OzyOLlHZK6yxOr0rk"; // Use the same API key as jujuAi.jsx
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 const normalRanges = {
     Temperature: [80, 102.5],
@@ -14,6 +18,7 @@ const isWithinRange = (value, [min, max]) => value >= min && value <= max;
 
 const Dashboard = () => {
     const { uid } = useParams();
+    const navigate = useNavigate();
     const [vitals, setVitals] = useState([
         { label: 'Temperature', value: '--', status: 'loading' },
         { label: 'Heart Rate', value: '--', status: 'loading' },
@@ -21,24 +26,40 @@ const Dashboard = () => {
         { label: 'Pulse (SpO2)', value: '--', status: 'loading' },
     ]);
 
+    const respiratoryStatus = vitals.find(vital => vital.label === 'Respiratory')?.status;
+    const [hasCheckedCheckbox, setHasCheckedCheckbox] = useState(false);
+    const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+
+    const handleCheckboxChange = (e, symptom) => {
+        if (e.target.checked) {
+            setSelectedSymptoms(prev => [...prev, symptom]);
+        } else {
+            setSelectedSymptoms(prev => prev.filter(s => s !== symptom));
+        }
+        setHasCheckedCheckbox(true); // Set to true if any checkbox is clicked
+    };
+
     useEffect(() => {
         const vitalsRef = ref(database, '/s_data');
-        
+        let currentVitalsData = null; // To store the latest vitals data
+
         const unsubscribe = onValue(vitalsRef, (snapshot) => {
-            const data = snapshot.val();
-            
+            const rawData = snapshot.val();
+            const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+            currentVitalsData = data; // Update the latest data
+
             if (data) {
                 const updatedVitals = [
                     {
                         label: 'Temperature',
-                        value: data.tempF || '--',
+                        value: data.tempF ? `${data.tempF}°F` : '--',
                         status: data.tempF ? 
                                 isWithinRange(data.tempF, normalRanges['Temperature']) ? 'normal' : 'abnormal'
                                 : 'no-data'
                     },
                     {
                         label: 'Heart Rate',
-                        value: data.avgBPM || '--',
+                        value: data.avgBPM ? `${data.avgBPM} BPM` : '--',
                         status: data.avgBPM ? 
                                 isWithinRange(data.avgBPM, normalRanges['Heart Rate']) ? 'normal' : 'abnormal'
                                 : 'no-data'
@@ -47,14 +68,11 @@ const Dashboard = () => {
                         label: 'Respiratory',
                         value: (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'Normal' : 'Abnormal',
                         status: (data.avgBPM && !isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'abnormal' :
-                                (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'normal' :
-                                (data.respiratory ?
-                                isWithinRange(data.respiratory, [12, 20]) ? 'normal' : 'abnormal'
-                                : 'not-available')
+                                (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'normal' : 'not-available'
                     },
                     {
                         label: 'Pulse (SpO2)',
-                        value: data.currentBPM || '--',
+                        value: data.currentBPM ? `${data.currentBPM}%` : '--',
                         status: data.currentBPM ? 
                                 isWithinRange(data.currentBPM, normalRanges['Pulse (SpO2)']) ? 'normal' : 'abnormal'
                                 : 'no-data'
@@ -80,10 +98,35 @@ const Dashboard = () => {
             ]);
         });
 
+        // Function to save vitals to Firestore
+        const saveVitalsToFirestore = async () => {
+            if (uid && currentVitalsData) {
+                try {
+                    await setDoc(doc(db, 'users', uid), {
+                        vitalsHistory: arrayUnion({
+                            ...currentVitalsData,
+                            timestamp: serverTimestamp()
+                        })
+                    }, { merge: true }); // Use setDoc with merge: true
+                    console.log('Vitals embedded in user document for:', uid);
+                } catch (error) {
+                    console.error('Error embedding vitals in user document:', error);
+                }
+            }
+        };
+
+        // Set up interval to save vitals every 15 minutes (900000 ms)
+        const intervalId = setInterval(saveVitalsToFirestore, 300000);
+
         return () => {
             unsubscribe();
+            clearInterval(intervalId); // Clear the interval on component unmount
         };
-    }, []);
+    }, [uid]); // Add uid to dependency array
+
+    
+
+
 
     return (
         <div className="dashboard">
@@ -123,6 +166,47 @@ const Dashboard = () => {
                                 <div className="vital-value">{vital.value}</div>
                             </div>
                         ))}
+                    </div>
+                    <button className="know-more-btn" onClick={() => navigate(`/analysis/${uid}`)}>Know More</button>
+
+                    {/* Conditional section for respiratory status */}
+                    <div className="respiratory-status-section">
+                        {respiratoryStatus === 'abnormal' ? (
+                            <div className="abnormal-questions">
+                                <h3>Please check all that apply:</h3>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Aggressive')} /> Aggressive
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Foaming Mouth')} /> Foaming Mouth
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Paralysis')} /> Paralysis
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Hydrophobia')} /> Hydrophobia
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Abnormal eyes')} /> Abnormal eyes
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Bald patches')} /> Bald patches
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Skin Issues')} /> Skin Issues
+                                </label>
+                                <label>
+                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Swollen parts')} /> Swollen parts
+                                </label>
+                                {hasCheckedCheckbox && (
+                                    <button className="submit-abnormal-report-btn" onClick={handleSubmitReport}>Submit Report</button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="all-fine-message">
+                                <p>Everything was fine.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
