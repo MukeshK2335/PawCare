@@ -132,37 +132,7 @@ const Stats = () => {
         return Math.round(value);
     };
 
-    return (
-        <section className="stats" ref={statsRef}>
-            <div className="stats-container">
-                {stats.map((stat, index) => (
-                    <div key={index} className="stat-item">
-                        <div className="stat-value">
-                            {stat.type === 'single' ? (
-                                <>
-                  <span className="stat-number">
-                    {formatValue(stat.key, animatedValues[stat.key])}
-                  </span>
-                                    <span className="stat-suffix">{stat.suffix}</span>
-                                </> 
-                            ) : (
-                                <>
-                  <span className="stat-number">
-                    {Math.round(animatedValues[`${stat.key}24`])}
-                  </span>
-                                    <span className="stat-separator">{stat.separator}</span>
-                                    <span className="stat-number">
-                    {Math.round(animatedValues[`${stat.key}7`])}
-                  </span>
-                                </>
-                            )}
-                        </div>
-                        <div className="stat-label">{stat.label}</div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
+
 };
 
 export default Stats;

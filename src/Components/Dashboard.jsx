@@ -33,12 +33,22 @@ const Dashboard = () => {
     const [showPopup, setShowPopup] = useState(false);
 
     const handleCheckboxChange = (e, symptom) => {
-        if (e.target.checked) {
-            setSelectedSymptoms(prev => [...prev, symptom]);
+        const { checked } = e.target;
+
+        if (symptom === 'Nothing') {
+            if (checked) {
+                setSelectedSymptoms(['Nothing']);
+            } else {
+                setSelectedSymptoms([]);
+            }
         } else {
-            setSelectedSymptoms(prev => prev.filter(s => s !== symptom));
+            if (checked) {
+                setSelectedSymptoms(prev => [...prev.filter(s => s !== 'Nothing'), symptom]);
+            } else {
+                setSelectedSymptoms(prev => prev.filter(s => s !== symptom));
+            }
         }
-        setHasCheckedCheckbox(true); // Set to true if any checkbox is clicked
+        setHasCheckedCheckbox(true);
     };
 
     useEffect(() => {
@@ -47,6 +57,7 @@ const Dashboard = () => {
 
         const unsubscribe = onValue(vitalsRef, (snapshot) => {
             const rawData = snapshot.val();
+            console.log("Raw Data from Firebase:", rawData);
             const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
             currentVitalsData = data; // Update the latest data
 
@@ -68,9 +79,8 @@ const Dashboard = () => {
                     },
                     {
                         label: 'Respiratory',
-                        value: (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'Normal' : 'Abnormal',
-                        status: (data.avgBPM && !isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'abnormal' :
-                                (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate'])) ? 'normal' : 'not-available'
+                        value: (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate']) && data.currentBPM && isWithinRange(data.currentBPM, normalRanges['Pulse (SpO2)'])) ? 'Normal' : 'Abnormal',
+                        status: (data.avgBPM && isWithinRange(data.avgBPM, normalRanges['Heart Rate']) && data.currentBPM && isWithinRange(data.currentBPM, normalRanges['Pulse (SpO2)'])) ? 'normal' : 'abnormal'
                     },
                     {
                         label: 'Pulse (SpO2)',
@@ -127,6 +137,15 @@ const Dashboard = () => {
     }, [uid]); // Add uid to dependency array
 
     const handleSubmitReport = async () => {
+        if (selectedSymptoms.length === 1 && selectedSymptoms[0] === 'Nothing') {
+            setPrediction({
+                summary: "There is a 50% chance of zoonotic diseases. Please visit a veterinary doctor for a checkup.",
+                diseases: []
+            });
+            setShowPopup(true);
+            return;
+        }
+
         const abnormalVitals = vitals.filter(v => v.status === 'abnormal');
 
         if (abnormalVitals.length === 0 && selectedSymptoms.length === 0) {
@@ -162,7 +181,10 @@ const Dashboard = () => {
         }
     };
 
-
+    const symptomsList = [
+        'Aggressive', 'Foaming Mouth', 'Paralysis', 'Hydrophobia',
+        'Abnormal eyes', 'Bald patches', 'Skin Issues', 'Swollen parts', 'Nothing'
+    ];
 
 
     return (
@@ -206,35 +228,20 @@ const Dashboard = () => {
                     </div>
                     <button className="know-more-btn" onClick={() => navigate(`/analysis/${uid}`)}>Know More</button>
 
-                    {/* Conditional section for respiratory status */} 
+                    {/* Conditional section for respiratory status */}
                     <div className="respiratory-status-section">
                         {respiratoryStatus === 'abnormal' ? (
                             <div className="abnormal-questions">
                                 <h3>Please check all that apply:</h3>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Aggressive')} /> Aggressive
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Foaming Mouth')} /> Foaming Mouth
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Paralysis')} /> Paralysis
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Hydrophobia')} /> Hydrophobia
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Abnormal eyes')} /> Abnormal eyes
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Bald patches')} /> Bald patches
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Skin Issues')} /> Skin Issues
-                                </label>
-                                <label>
-                                    <input type="checkbox" onChange={(e) => handleCheckboxChange(e, 'Swollen parts')} /> Swollen parts
-                                </label>
+                                {symptomsList.map(symptom => (
+                                    <label key={symptom}>
+                                        <input
+                                            type="checkbox"
+                                            onChange={(e) => handleCheckboxChange(e, symptom)}
+                                            checked={selectedSymptoms.includes(symptom)}
+                                        /> {symptom}
+                                    </label>
+                                ))}
                                 {hasCheckedCheckbox && (
                                     <button className="submit-abnormal-report-btn" onClick={handleSubmitReport}>Submit Report</button>
                                 )}
